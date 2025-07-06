@@ -9,20 +9,68 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
+  padding: 0;
+  width: 100%;
   min-height: 100vh;
 }
 
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+
+/* fonts  */
+
+.patua-one-regular {
+  font-family: "Patua One", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.oswald-regular {
+  font-family: "Oswald", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+/* colors  */
+
+.primary-color {
+  color: #a10140;
+}
+
+.secondary-color {
+  color: #ffc5c4;
+}
+
+.teritiary-color {
+  color: #0a314f;
+}
+
+.custom-violet{
+  color: #d1b7ff;
+}
+
+
+
+.primary-bg {
+  @apply bg-[#a10140];
+}
+.secondary-bg {
+  @apply bg-[#ffc5c4];
+}
+.tertiary-bg {
+  @apply bg-[#0a314f];
+}
+.custom-violet-bg {
+  @apply bg-[#d1b7ff];
+}
+
+.spacer{
+  @apply md:px-16 px-8 py-16
+}
