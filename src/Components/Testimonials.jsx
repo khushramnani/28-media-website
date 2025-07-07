@@ -1,7 +1,75 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Quote, Star } from 'lucide-react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useGSAP } from '@gsap/react'
+
+// Register GSAP plugins
+gsap.registerPlugin(ScrollTrigger)
 
 const Testimonials = () => {
+  const sectionRef = useRef(null);
+  const headerRef = useRef(null);
+  const cardsRef = useRef([]);
+
+  // GSAP animations
+  useGSAP(() => {
+    // Header animation
+    if (headerRef.current) {
+      gsap.fromTo(headerRef.current.children, 
+        { 
+          y: 50, 
+          opacity: 0 
+        },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          stagger: 0.2,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: headerRef.current,
+            start: "top 85%",
+            end: "bottom 20%",
+            toggleActions: "play none none reverse"
+          }
+        }
+      );
+    }
+
+    // Testimonial cards animation
+    const validCards = cardsRef.current.filter(card => card !== null);
+    if (validCards.length > 0) {
+      // Set initial state
+      gsap.set(validCards, { 
+        x: 100, 
+        opacity: 0,
+        scale: 0.9
+      });
+      
+      // Staggered entrance animation
+      gsap.to(validCards, {
+        x: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 80%",
+          end: "bottom 20%",
+          toggleActions: "play none none reverse"
+        }
+      });
+    }
+
+    // Cleanup
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    };
+  }, []);
+
   // Testimonials data
   const testimonials = [
     {
@@ -73,12 +141,12 @@ const Testimonials = () => {
   ];
 
   return (
-    <section className="testimonials-section bg-gray-50 ">
-      <div className="spacer  ">
+    <section ref={sectionRef} id='testimonials' className="testimonials-section bg-gray-50">
+      <div className="spacer">
         {/* Section Header */}
-        <div className="text-start px-8 flex flex-col justify-start">
-          <span className="text-orange-500 text-xl font-bold oswald-regular ">*SPOILER: THEY LOVE IT!</span>
-          <h2 className="text-4xl md:text-5xl max-w-2xl font-bold teritiary-color patua-one-regular mt-2">
+        <div ref={headerRef} className="text-start px-4 sm:px-8 flex flex-col justify-start">
+          <span className="text-orange-500 text-lg sm:text-xl font-bold oswald-regular">*SPOILER: THEY LOVE IT!</span>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl max-w-2xl font-bold teritiary-color patua-one-regular mt-2 leading-tight">
             Here's Is What <span className="text-orange-500">Clients</span> Say's About Our Work
           </h2>
           {/* <p className="text-gray-600 text-lg mt-4 max-w-2xl ">
@@ -87,39 +155,44 @@ const Testimonials = () => {
         </div>
 
         {/* Horizontal Scrollable Cards */}
-        <div className="relative h-full  ">
-          <div className="flex overflow-x-auto scrollbar-hide px-8 gap-6  py-8 pb-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {testimonials.map((testimonial) => (
+        <div className="relative h-full">
+          <div className="flex overflow-x-auto scrollbar-hide px-4 sm:px-8 gap-4 sm:gap-6 py-6 sm:py-8 pb-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {testimonials.map((testimonial, index) => (
               <div
                 key={testimonial.id}
-                className={`flex-shrink-0 w-[30vw] bg-gradient-to-br ${testimonial.bgColor} rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
+                ref={el => {
+                  if (el) {
+                    cardsRef.current[index] = el;
+                  }
+                }}
+                className={`flex-shrink-0 w-[85vw] sm:w-[70vw] md:w-[50vw] lg:w-[30vw] bg-gradient-to-br ${testimonial.bgColor} rounded-2xl p-4 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105`}
               >
                 <span>
-                    <Quote className="w-6 h-6 text-white mb-4" />
+                    <Quote className="w-5 h-5 sm:w-6 sm:h-6 text-white mb-3 sm:mb-4" />
                 </span>
                
                 {/* Testimonial Text */}
-                <blockquote className={`${testimonial.textColor} text-lg leading-relaxed mb-6 italic`}>
+                <blockquote className={`${testimonial.textColor} text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-6 italic`}>
                   "{testimonial.testimonial}"
                 </blockquote>
 
                 {/* Client Info */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
                   <div className="relative">
                     <img
                       src={testimonial.image}
                       alt={testimonial.name}
-                      className="w-12 h-12 rounded-full object-cover border-2 border-white/20"
+                      className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-white/20"
                     />
                   </div>
                   <div>
-                    <h4 className={`${testimonial.textColor} font-semibold oswald-regular`}>
+                    <h4 className={`${testimonial.textColor} font-semibold oswald-regular text-sm sm:text-base`}>
                       {testimonial.name}
                     </h4>
-                    <p className={`${testimonial.textColor} opacity-90 text-sm`}>
+                    <p className={`${testimonial.textColor} opacity-90 text-xs sm:text-sm`}>
                       {testimonial.position}
                     </p>
-                    <p className={`${testimonial.textColor} opacity-75 text-sm font-medium`}>
+                    <p className={`${testimonial.textColor} opacity-75 text-xs sm:text-sm font-medium`}>
                       {testimonial.company}
                     </p>
                   </div>
@@ -129,8 +202,8 @@ const Testimonials = () => {
           </div>
 
           {/* Scroll Indicator */}
-          <div className="flex justify-center mt-6">
-            <p className="text-gray-500 text-sm flex items-center gap-2">
+          <div className="flex justify-center mt-4 sm:mt-6">
+            <p className="text-gray-500 text-xs sm:text-sm flex items-center gap-2">
               <span>←</span> Scroll to see more testimonials <span>→</span>
             </p>
           </div>

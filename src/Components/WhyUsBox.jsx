@@ -1,7 +1,11 @@
 import React, { useRef, useEffect } from 'react'
 import {Boxes , ArrowUpRight, ArrowRight} from 'lucide-react'
 import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { useGSAP } from '@gsap/react'
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger)
 
 const WhyUsBox = () => {
     const whyUsData = [
@@ -29,10 +33,37 @@ const WhyUsBox = () => {
     ]
 
     const boxRefs = useRef([])
+    const containerRef = useRef(null)
 
     useGSAP(() => {
         // Filter out null/undefined refs and ensure we have valid elements
         const validBoxes = boxRefs.current.filter(box => box !== null && box !== undefined)
+        
+        // Initial entrance animation for all boxes
+        if (validBoxes.length > 0) {
+            // Set initial state - boxes hidden
+            gsap.set(validBoxes, { 
+                y: 50, 
+                opacity: 0,
+                scale: 0.95
+            })
+            
+            // Entrance animation with ScrollTrigger
+            gsap.to(validBoxes, {
+                y: 0,
+                opacity: 1,
+                scale: 1,
+                duration: 0.8,
+                stagger: 0.2, // This creates the one-by-one effect
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top 85%",
+                    end: "bottom 20%",
+                    toggleActions: "play none none reverse"
+                }
+            })
+        }
         
         validBoxes.forEach((box, index) => {
             if (box) {
@@ -133,10 +164,15 @@ const WhyUsBox = () => {
                 }
             }
         })
+        
+        // Cleanup ScrollTrigger instances
+        return () => {
+            ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+        }
     }, [whyUsData.length]) // Add dependency to re-run when data length changes
 
   return (
-    <div className='flex flex-col justify-between gap-4 pt-8 w-full'>
+    <div ref={containerRef} className='flex flex-col justify-between gap-4 pt-8 w-full'>
       {whyUsData.map((item, index) => (
         <div 
           key={index} 
@@ -147,17 +183,17 @@ const WhyUsBox = () => {
           }}
           className='cursor-pointer'
         >
-          <div className='main-box-inner w-full flex justify-between secondary-bg p-8 rounded-4xl'>
-            <div className='flex w-[40%] items-center justify-start gap-6'>
-              <Boxes className='box-icon text-2xl h-8 w-8 primary-color' />
-              <h3 className='box-title text-white text-4xl font-bold patua-one-regular primary-color'>{item.title}</h3>
+          <div className='main-box-inner w-full flex flex-col md:flex-row justify-between secondary-bg p-4 sm:p-6 md:p-8 rounded-4xl gap-4 md:gap-0'>
+            <div className='flex w-full md:w-[40%] items-center justify-start gap-4 md:gap-6'>
+              <Boxes className='box-icon text-xl sm:text-2xl h-6 w-6 sm:h-8 sm:w-8 primary-color flex-shrink-0' />
+              <h3 className='box-title text-white text-xl sm:text-2xl md:text-4xl font-bold patua-one-regular primary-color leading-tight'>{item.title}</h3>
             </div>
 
-            <div className='flex items-center w-[60%] justify-between'>
-              <p className='box-description text-white primary-color'>{item.description}</p>
-              <div className='arrow-box primary-bg p-8 rounded-full flex items-center justify-center relative'>
-                <ArrowRight className='arrow-right h-8 w-8 absolute secondary-color' />
-                <ArrowUpRight className='arrow-up-right h-8 w-8 absolute secondary-color' />
+            <div className='flex flex-col md:flex-row items-start md:items-center w-full md:w-[60%] justify-between gap-4 md:gap-0'>
+              <p className='box-description text-white primary-color text-sm sm:text-base leading-relaxed'>{item.description}</p>
+              <div className='arrow-box primary-bg p-4 sm:p-6 md:p-8 rounded-full flex items-center justify-center relative flex-shrink-0 self-end md:self-center'>
+                <ArrowRight className='arrow-right h-6 w-6 sm:h-8 sm:w-8 absolute secondary-color' />
+                <ArrowUpRight className='arrow-up-right h-6 w-6 sm:h-8 sm:w-8 absolute secondary-color' />
               </div>
             </div>
           </div>

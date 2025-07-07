@@ -11,7 +11,7 @@ const CalendySection = () => {
   return (
     <>
     {/* Founder/About Section */}
-    <section className="founder-section bg-white py-16 px-8 md:px-16">
+    <section id="contact" className="founder-section bg-white py-16 px-8 md:px-16">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           {/* Left Side - Text Content */}
